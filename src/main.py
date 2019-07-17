@@ -7,29 +7,37 @@ Created on Jul 9, 2019
 
 import threading
 from cluster_box.server import CluserBoxServer
+from weather_box.server import WeatherBoxServer
 
-if __name__ == '__main__':
+class ThreadBox(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self.daemon = True
+        
+    def run(self):
+        httpd = CluserBoxServer(8080)
+        httpd.read_services("services.ini")
+        httpd.serve_forever()
+
+def start_weather_box():
     '''
-    cluster = CluserBoxServer(8080)
-    cluster.read_services("services.ini")
-    cluster.serve_forever()
-    cluster_thread = Thread(target=cluster.serve_forever, name="cluster_thread", args=(), daemon=True)
-    cluster_thread.start()
-    print("ready")
+    Start the WeatherBoxServer and wait for queries
     '''
-    class ThreadBox(threading.Thread):
-        def __init__(self):
-            threading.Thread.__init__(self)
-            self.daemon = True
-            
-        def run(self):
-            httpd = CluserBoxServer(8080)
-            httpd.read_services("services.ini")
-            httpd.serve_forever()
-    
+    box = WeatherBoxServer(8080)
+    box.serve_forever()
+
+def start_cluster_box():
+    '''
+    Start the CluserBoxServer in a thread
+    '''
     thread1 = ThreadBox()
     thread1.start()
     print("ready")
     thread1.join()
     print("End.")
+    
+if __name__ == '__main__':
+    
+    start_weather_box()
+    
             
