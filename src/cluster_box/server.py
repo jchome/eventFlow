@@ -14,6 +14,7 @@ from standalone_box.server import StandaloneBoxServer
 from cluster_box.requesthandler import CluserRequestHandler
 from urllib import request, parse
 import configparser
+from http import HTTPStatus
 
 class CluserBoxServer(StandaloneBoxServer):
     '''
@@ -47,13 +48,30 @@ class CluserBoxServer(StandaloneBoxServer):
         return self.services
     
     def call_service(self, service_name, data):
+        '''
+        Call the service with the data object 
+        '''
+        
         # If failed, try another url of the service
         url = self.get_service(service_name)
+        # Encode data for transport
         data_encoded = parse.urlencode(data).encode()
+        
         # Call as POST method
         req = request.Request(url, data=data_encoded)
+        
+        # Get the HTTPResponse
         response = request.urlopen(req)
-        return response
+        
+        if response.getcode() != 200:
+            return self.send_json_error("Reponse is not 200", response.getcode())
+        
+        content_type = response.getheader('Content-type')
+        if content_type != 'text/json':
+            return self.send_json_error("Content-type not parsable: %s" % content_type, 500)
+        
+        return response.read().decode('latin1')
+        
     
     def get_service(self, service_name, index=0):
         service_data = self.services.get(service_name)

@@ -23,7 +23,7 @@ def start_weather_box():
     '''
     Start the WeatherBoxServer and wait for queries
     '''
-    box = WeatherBoxServer(8080)
+    box = WeatherBoxServer(8081)
     box.serve_forever()
 
 def start_cluster_box():
@@ -37,7 +37,10 @@ def start_cluster_box():
     print("End.")
     
 if __name__ == '__main__':
+    #start_weather_box()
     
-    start_weather_box()
+    httpd = CluserBoxServer(8080)
+    httpd.read_services("services.ini")
+    print(httpd.call_service("weatherdata", {"city": "Cannes,FR"}))
     
             

@@ -41,7 +41,7 @@ class GetWrapperBoxServer(StandaloneBoxServer):
         Call the HTTP GET request
         '''
         if not self.check_inputs(query_components):
-            return "invalid inputs"
+            return "GetWrapperBoxServer: invalid inputs"
         url = self.define_url(query_components)
         
         r = requests.get(url)

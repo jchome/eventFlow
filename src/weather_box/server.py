@@ -25,16 +25,18 @@ class WeatherBoxServer(GetWrapperBoxServer):
         city = query_components.get(self.keyForCity)
         if city is None:
             return False
-        if len(city.split(",")) != 2:
+        if len(city) == 0:
             return False
         return True
     
     def define_url(self, query_components):
-        city = query_components.get(self.keyForCity)
+        # Take the first city of the query
+        city = query_components.get(self.keyForCity)[0]
         url = "http://api.openweathermap.org/data/2.5/weather?q=%(city)s&APPID=%(api_key)s" % {
             'api_key': self.AKI_KEY,
             'city': city}
         return url
-        
-    
+
+if __name__ == '__main__':
+    WeatherBoxServer(8081).serve_forever()
     
