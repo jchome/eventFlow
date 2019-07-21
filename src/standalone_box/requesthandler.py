@@ -14,6 +14,10 @@ class StandaloneRequestHandler(BaseHTTPRequestHandler):
         message = {"result": "ok"}
         return self.send_json_message(message)
     
+    def do_POST(self):
+        message = {"result": "ok"}
+        return self.send_json_message(message)
+    
     def send_json_message(self, message):
         self.server.send_json_message(self, message, 200)
         
@@ -25,7 +29,7 @@ class StandaloneRequestHandler(BaseHTTPRequestHandler):
     
     def parse_GET(self):
         query = urlparse(self.path).query
-        return dict(qc.split("=") for qc in query.split("&"))
+        return parse_qs(query)
     
     def parse_POST(self):
         ctype, pdict = parse_header(self.headers['content-type'])
@@ -33,8 +37,9 @@ class StandaloneRequestHandler(BaseHTTPRequestHandler):
             postvars = parse_multipart(self.rfile, pdict)
         elif ctype == 'application/x-www-form-urlencoded':
             length = int(self.headers['content-length'])
+            data = self.rfile.read(length).decode('latin1')
             postvars = parse_qs(
-                    self.rfile.read(length), 
+                    data, 
                     keep_blank_values=1)
         else:
             postvars = {}
